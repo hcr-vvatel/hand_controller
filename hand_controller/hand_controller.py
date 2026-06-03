@@ -47,7 +47,7 @@ class HandController(Node):
         ### Instance Variables
         self.velocity = 1.0
         self.bridge = CvBridge()
-        self.controller_timer = self.create_timer(1.0 / self.TIMER_RATE_HZ, self.timer_callback)
+        self.controller_timer = self.create_timer(1.0 / self.TIMER_RATE, self.timer_callback)
         self.hand_tracker = LiveLandmarkDetector(number_of_hands=1)
 
         self.get_logger().info("Hand Controller Ready...")
@@ -90,7 +90,7 @@ class HandController(Node):
         elif num_fingers_raised == 2:
             ### Accelerate
             self.velocity += self.VELOCITY_INCREMENTS
-            self.velocity = min(self.VELOCITY_MAX, self.velocity)
+            self.velocity = min(self.MAX_VELOCITY, self.velocity)
             self.get_logger().info(f"Command: Accelerate! Speed = {self.velocity}")
         elif num_fingers_raised == 3:
             ### Decelerate
@@ -100,7 +100,7 @@ class HandController(Node):
         elif num_fingers_raised == 1 and raised_fingers[0] == "index":
             ### Turn
             index_angle = control_hand.calculate_finger_angle("index")
-            index_angle = min(max(index_angle, -self.MAX_ANGLE), self.MAX_ANGLE)  # Clamp steering angle
+            index_angle = min(max(index_angle, -self.MAX_STEERING_ANGLE), self.MAX_STEERING_ANGLE)  # Clamp steering angle
             self.get_logger().info(f"Command: Turn: {int(index_angle * (180/np.pi))} degrees")
             drive_cmd = self.create_angle_cmd(index_angle)
         elif num_fingers_raised == 0:
